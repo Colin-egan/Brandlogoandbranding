@@ -585,6 +585,22 @@ export default function App() {
           />
 
           <DownloadCard
+            title="LinkedIn Banner"
+            description="1584 × 396px cover image"
+            preview={
+              <div className="w-full h-full flex items-center justify-center" style={{ background: B.bg }}>
+                <div className="text-center">
+                  <p className="font-black text-xl tracking-[0.18em] uppercase" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>TORQUE</p>
+                  <p className="text-[9px] tracking-[0.55em] uppercase mt-1" style={{ color: B.muted }}>leverage your network</p>
+                </div>
+              </div>
+            }
+            files={[
+              { label: "SVG", path: "/logos/torque-linkedin-banner.svg" },
+            ]}
+          />
+
+          <DownloadCard
             title="PNG Exports"
             description="Rasterized versions"
             preview={<Mark size={80} />}

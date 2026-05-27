@@ -17,6 +17,9 @@ This directory contains all official Torque logo files for use across digital an
 - **torque-wordmark-horizontal-dark.svg** — Full wordmark with tagline, dark
 - **torque-wordmark-horizontal-light.svg** — Full wordmark with tagline, light
 
+### Social Media
+- **torque-linkedin-banner.svg** — LinkedIn cover image (1584 × 396px)
+
 ## Usage Guidelines
 
 ### Clear Space
