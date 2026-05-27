@@ -1,0 +1,14 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="Torque icon">
+  <line x1="50" y1="50" x2="6" y2="50" stroke="#2563EB" stroke-width="10" stroke-linecap="round"/>
+  <path d="M72.728,72.728 A32,32,0,1,1,72.728,27.272 L68.284,31.716 A26,26,0,1,0,68.284,68.284Z" fill="#2563EB"/>
+  <line x1="50" y1="50" x2="68.385" y2="68.385" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.38"/>
+  <line x1="50" y1="50" x2="68.385" y2="31.615" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.38"/>
+  <line x1="68.385" y1="68.385" x2="68.385" y2="31.615" stroke="#FFFFFF" stroke-width="1" stroke-opacity="0.18"/>
+  <circle cx="50" cy="50" r="4.5" fill="#2563EB"/>
+  <circle cx="50" cy="50" r="2.2" fill="#0C1219"/>
+  <circle cx="68.385" cy="68.385" r="5.5" fill="#FFFFFF"/>
+  <circle cx="68.385" cy="31.615" r="5.5" fill="#FFFFFF"/>
+  <circle cx="6" cy="50" r="6.5" fill="#0C1219"/>
+  <circle cx="6" cy="50" r="4" fill="#2563EB"/>
+  <circle cx="6" cy="50" r="2" fill="#FFFFFF"/>
+</svg>

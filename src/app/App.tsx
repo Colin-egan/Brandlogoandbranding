@@ -1,4 +1,5 @@
 // Torque — Brand Identity System
+import React from "react";
 
 const B = {
   bg: "#05080F",
@@ -111,6 +112,113 @@ const PALETTE = [
   { name: "Arctic White", hex: "#F0F4F8" },
 ];
 
+// ────────────────────────────────────────────────────────────
+// Download Card Component
+// ────────────────────────────────────────────────────────────
+
+interface DownloadCardProps {
+  title: string;
+  description: string;
+  preview: React.ReactNode;
+  bgColor?: string;
+  files: Array<{
+    label: string;
+    path: string;
+    isPng?: boolean;
+    size?: number;
+  }>;
+}
+
+function DownloadCard({ title, description, preview, bgColor = B.surface, files }: DownloadCardProps) {
+  const downloadSVG = (path: string, filename: string) => {
+    const link = document.createElement("a");
+    link.href = path;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const downloadPNG = async (svgPath: string, filename: string, size: number) => {
+    try {
+      const response = await fetch(svgPath);
+      const svgText = await response.text();
+      const blob = new Blob([svgText], { type: "image/svg+xml" });
+      const url = URL.createObjectURL(blob);
+
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, size, size);
+          canvas.toBlob((pngBlob) => {
+            if (pngBlob) {
+              const pngUrl = URL.createObjectURL(pngBlob);
+              const link = document.createElement("a");
+              link.href = pngUrl;
+              link.download = filename;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              URL.revokeObjectURL(pngUrl);
+            }
+          });
+        }
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+    } catch (error) {
+      console.error("PNG export failed:", error);
+    }
+  };
+
+  return (
+    <div
+      className="rounded-2xl overflow-hidden"
+      style={{ border: `1px solid ${B.border}` }}
+    >
+      <div
+        className="p-8 flex items-center justify-center"
+        style={{ background: bgColor, minHeight: 140 }}
+      >
+        {preview}
+      </div>
+      <div className="p-4" style={{ background: B.surface }}>
+        <p className="font-semibold text-sm mb-1">{title}</p>
+        <p className="text-xs mb-4" style={{ color: B.muted }}>
+          {description}
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {files.map((file) => {
+            const filename = file.path.split("/").pop()?.replace(".svg", file.isPng ? `.${file.size}px.png` : ".svg") || "logo";
+            return (
+              <button
+                key={file.label}
+                onClick={() =>
+                  file.isPng && file.size
+                    ? downloadPNG(file.path, filename, file.size)
+                    : downloadSVG(file.path, filename)
+                }
+                className="px-3 py-1.5 text-xs font-medium rounded-lg transition-all hover:scale-105"
+                style={{
+                  background: B.surfaceHigh,
+                  color: B.bluePale,
+                  border: `1px solid ${B.border}`,
+                }}
+              >
+                {file.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <div
@@ -220,18 +328,26 @@ export default function App() {
           {PALETTE.map((c) => (
             <div key={c.hex} className="flex-1">
               <div
-                className="h-20 rounded-2xl mb-4"
+                className="h-20 rounded-2xl mb-4 cursor-pointer transition-transform hover:scale-105"
                 style={{
                   background: c.hex,
                   border: c.hex === "#05080F" ? `1px solid ${B.border}` : "none",
                 }}
+                onClick={() => {
+                  navigator.clipboard.writeText(c.hex);
+                }}
+                title="Click to copy hex code"
               />
               <p className="text-xs font-semibold" style={{ color: B.white }}>
                 {c.name}
               </p>
               <p
-                className="text-xs font-mono mt-1"
+                className="text-xs font-mono mt-1 cursor-pointer hover:text-white transition-colors"
                 style={{ color: B.muted }}
+                onClick={() => {
+                  navigator.clipboard.writeText(c.hex);
+                }}
+                title="Click to copy"
               >
                 {c.hex}
               </p>
@@ -304,7 +420,10 @@ export default function App() {
       </section>
 
       {/* ── IN CONTEXT ───────────────────────────────────── */}
-      <section className="px-16 py-20">
+      <section
+        className="px-16 py-20"
+        style={{ borderBottom: `1px solid ${B.border}` }}
+      >
         <p className="text-xs tracking-[0.35em] uppercase mb-10" style={{ color: B.muted }}>
           In Context
         </p>
@@ -389,6 +508,122 @@ export default function App() {
           </div>
 
           <Mark size={88} />
+        </div>
+      </section>
+
+      {/* ── DOWNLOADS ────────────────────────────────────── */}
+      <section className="px-16 py-20">
+        <p className="text-xs tracking-[0.35em] uppercase mb-10" style={{ color: B.muted }}>
+          Download Assets
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <DownloadCard
+            title="Primary Dark"
+            description="Logo with dark background"
+            preview={<Mark size={80} />}
+            files={[
+              { label: "SVG", path: "/logos/torque-primary-dark.svg" },
+              { label: "Icon SVG", path: "/logos/torque-icon-only-dark.svg" },
+            ]}
+          />
+
+          <DownloadCard
+            title="Primary Light"
+            description="Logo with light background"
+            preview={<Mark size={80} bg="#EEF2F7" accent={B.blue} node="#0C1219" />}
+            bgColor="#F8FAFC"
+            files={[
+              { label: "SVG", path: "/logos/torque-primary-light.svg" },
+              { label: "Icon SVG", path: "/logos/torque-icon-only-light.svg" },
+            ]}
+          />
+
+          <DownloadCard
+            title="Reversed Blue"
+            description="White on blue background"
+            preview={<Mark size={80} bg={B.blue} accent="#FFFFFF" node={B.blue} />}
+            bgColor={B.blue}
+            files={[
+              { label: "SVG", path: "/logos/torque-reversed-blue.svg" },
+            ]}
+          />
+
+          <DownloadCard
+            title="Wordmark Dark"
+            description="Horizontal lockup, dark"
+            preview={
+              <div className="flex items-center gap-3">
+                <Mark size={40} />
+                <div>
+                  <p className="font-black text-xs tracking-[0.15em] uppercase" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>TORQUE</p>
+                  <p className="text-[7px] tracking-[0.4em] uppercase" style={{ color: B.muted }}>leverage your network</p>
+                </div>
+              </div>
+            }
+            files={[
+              { label: "SVG", path: "/logos/torque-wordmark-horizontal-dark.svg" },
+            ]}
+          />
+
+          <DownloadCard
+            title="Wordmark Light"
+            description="Horizontal lockup, light"
+            preview={
+              <div className="flex items-center gap-3">
+                <Mark size={40} bg="#E2E8F0" accent={B.blue} node="#0C1219" />
+                <div>
+                  <p className="font-black text-xs tracking-[0.15em] uppercase" style={{ fontFamily: "'Space Grotesk', sans-serif", color: "#0C1219" }}>TORQUE</p>
+                  <p className="text-[7px] tracking-[0.4em] uppercase" style={{ color: "#607090" }}>leverage your network</p>
+                </div>
+              </div>
+            }
+            bgColor="#F8FAFC"
+            files={[
+              { label: "SVG", path: "/logos/torque-wordmark-horizontal-light.svg" },
+            ]}
+          />
+
+          <DownloadCard
+            title="PNG Exports"
+            description="Rasterized versions"
+            preview={<Mark size={80} />}
+            files={[
+              { label: "512px PNG", path: "/logos/torque-primary-dark.svg", isPng: true, size: 512 },
+              { label: "256px PNG", path: "/logos/torque-primary-dark.svg", isPng: true, size: 256 },
+              { label: "128px PNG", path: "/logos/torque-primary-dark.svg", isPng: true, size: 128 },
+              { label: "64px PNG", path: "/logos/torque-primary-dark.svg", isPng: true, size: 64 },
+              { label: "32px PNG", path: "/logos/torque-primary-dark.svg", isPng: true, size: 32 },
+            ]}
+          />
+        </div>
+
+        {/* Usage guidelines */}
+        <div
+          className="mt-10 rounded-2xl px-8 py-6"
+          style={{ background: B.surface, border: `1px solid ${B.border}` }}
+        >
+          <p className="text-xs tracking-[0.35em] uppercase mb-4" style={{ color: B.muted }}>
+            Usage Guidelines
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm" style={{ color: B.muted }}>
+            <div>
+              <p className="font-semibold mb-2" style={{ color: B.white }}>Clear Space</p>
+              <p>Maintain minimum padding equal to the height of the lever arm around the logo.</p>
+            </div>
+            <div>
+              <p className="font-semibold mb-2" style={{ color: B.white }}>Minimum Size</p>
+              <p>Never display the logo smaller than 32px × 32px for digital or 0.5" for print.</p>
+            </div>
+            <div>
+              <p className="font-semibold mb-2" style={{ color: B.white }}>Color Modifications</p>
+              <p>Do not alter logo colors. Use only the provided variants.</p>
+            </div>
+            <div>
+              <p className="font-semibold mb-2" style={{ color: B.white }}>Distortion</p>
+              <p>Do not stretch, rotate, or skew the logo. Always maintain aspect ratio.</p>
+            </div>
+          </div>
         </div>
       </section>
     </div>
